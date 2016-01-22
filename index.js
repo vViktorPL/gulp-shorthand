@@ -4,7 +4,14 @@ var gutil = require('gulp-util');
 var shorthand = require('shrthnd');
 var through = require('through2');
 
-module.exports = function () {
+module.exports = function (options) {
+	var shorthandLibOptions = {};
+	options = options || {};
+
+	if ('androidCompatible' in options && options.androidCompatible) {
+		shorthandLibOptions.ignoreProperty = ['background'];
+	}
+
 	return through.obj(function (file, enc, cb) {
 		if (file.isNull()) {
 			cb(null, file);
@@ -17,7 +24,7 @@ module.exports = function () {
 		}
 
 		try {
-			var ret = shorthand(file.contents.toString());
+			var ret = shorthand(file.contents.toString(), shorthandLibOptions);
 			file.contents = new Buffer(ret.string);
 			this.push(file);
 		} catch (err) {
